@@ -48,8 +48,8 @@ export default function TaskHistory() {
         </div>
       </div>
 
-      <Card className="p-0 overflow-hidden">
-        <table className="w-full text-sm">
+      <Card className="p-0 overflow-x-auto">
+        <table className="w-full text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-[var(--border)] text-[var(--text-muted)]">
               <th className="px-4 py-3 text-left">时间</th>

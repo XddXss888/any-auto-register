@@ -127,9 +127,9 @@ function Field({ field, form, setForm, showSecret, setShowSecret }: any) {
   const { key, label, placeholder, secret } = field
   const options = SELECT_FIELDS[key]
   return (
-    <div className="grid grid-cols-3 gap-4 items-center py-3 border-b border-white/5 last:border-0">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 items-start md:items-center py-3 border-b border-[var(--border)] last:border-0">
       <label className="text-sm text-[var(--text-secondary)] font-medium">{label}</label>
-      <div className="col-span-2 relative">
+      <div className="col-span-1 md:col-span-2 relative">
         {options ? (
           <select
             value={form[key] || options[0].value}
@@ -200,13 +200,13 @@ export default function Settings() {
         <p className="text-[var(--text-muted)] text-sm mt-1">配置将持久化保存，注册任务自动使用</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col md:flex-row gap-6">
         {/* Left nav */}
-        <div className="w-44 shrink-0 space-y-1">
+        <div className="w-full md:w-44 shrink-0 flex flex-row md:flex-col gap-2 overflow-x-auto md:space-y-1 pb-2 md:pb-0">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button key={id} onClick={() => setActiveTab(id)}
               className={cn(
-                'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
+                'whitespace-nowrap flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
                 activeTab === id
                   ? 'bg-indigo-600/20 text-[var(--text-accent)] font-medium'
                   : 'text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
@@ -217,7 +217,7 @@ export default function Settings() {
           ))}
 
           {/* Solver status */}
-          <div className="mt-4 pt-4 border-t border-[var(--border)]">
+          <div className="hidden md:block mt-4 pt-4 border-t border-[var(--border)]">
             <p className="text-xs text-[var(--text-muted)] px-3 mb-2">Turnstile Solver</p>
             <div className="px-3 flex items-center gap-2">
               {solverRunning === null

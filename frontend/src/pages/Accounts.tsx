@@ -399,12 +399,12 @@ const [accounts, setAccounts] = useState<any[]>([])
       {showRegister && <RegisterModal platform={tab} onClose={() => setShowRegister(false)} onDone={() => load()} />}
 
       {/* 操作栏 */}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
         {/* 左侧：搜索和过滤 */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <input type="text" placeholder="搜索邮箱..."
             value={search} onChange={e => setSearch(e.target.value)}
-            className="bg-[var(--bg-hover)] border border-[var(--border)] text-[var(--text-primary)] rounded-md px-3 py-1.5 text-sm w-44" />
+            className="bg-[var(--bg-hover)] border border-[var(--border)] text-[var(--text-primary)] rounded-md px-3 py-1.5 text-sm flex-1 sm:w-44" />
           <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
             className="bg-[var(--bg-hover)] border border-[var(--border)] text-[var(--text-primary)] rounded-md px-2 py-1.5 text-sm">
             <option value="">全部状态</option>
@@ -414,23 +414,23 @@ const [accounts, setAccounts] = useState<any[]>([])
             <option value="expired">已过期</option>
             <option value="invalid">已失效</option>
           </select>
-          <span className="text-xs text-[var(--text-muted)]">{total} 个账号</span>
+          <span className="text-xs text-[var(--text-muted)] whitespace-nowrap">{total} 个账号</span>
         </div>
         {/* 右侧：操作按钮 */}
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowImport(true)}><Upload className="h-4 w-4 mr-1" />导入</Button>
-          <Button variant="outline" size="sm" onClick={exportCsv} disabled={accounts.length === 0}><Download className="h-4 w-4 mr-1" />导出</Button>
-          <Button variant="outline" size="sm" onClick={() => setShowAdd(true)}><Plus className="h-4 w-4 mr-1" />新增</Button>
-          <Button variant="outline" size="sm" onClick={() => setShowRegister(true)}><PlusCircle className="h-4 w-4 mr-1" />注册</Button>
-          <Button variant="outline" size="sm" onClick={() => load()} disabled={loading}>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+          <Button variant="outline" size="sm" onClick={() => setShowImport(true)} className="flex-1 sm:flex-none"><Upload className="h-4 w-4 sm:mr-1" /><span className="hidden sm:inline">导入</span></Button>
+          <Button variant="outline" size="sm" onClick={exportCsv} disabled={accounts.length === 0} className="flex-1 sm:flex-none"><Download className="h-4 w-4 sm:mr-1" /><span className="hidden sm:inline">导出</span></Button>
+          <Button variant="outline" size="sm" onClick={() => setShowAdd(true)} className="flex-1 sm:flex-none"><Plus className="h-4 w-4 sm:mr-1" /><span className="hidden sm:inline">新增</span></Button>
+          <Button variant="outline" size="sm" onClick={() => setShowRegister(true)} className="flex-1 sm:flex-none"><PlusCircle className="h-4 w-4 sm:mr-1" /><span className="hidden sm:inline">注册</span></Button>
+          <Button variant="outline" size="sm" onClick={() => load()} disabled={loading} className="flex-none">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
 
       {/* 账号表格 */}
-      <Card>
-        <table className="w-full text-sm">
+      <Card className="overflow-x-auto">
+        <table className="w-full text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-[var(--border)] text-[var(--text-muted)] text-xs">
               <th className="px-4 py-3 text-left">邮箱</th>

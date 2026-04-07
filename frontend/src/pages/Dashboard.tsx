@@ -56,7 +56,7 @@ export default function Dashboard() {
       </div>
 
       {/* 统计卡片 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map(({ label, value, icon: Icon, color }) => (
           <Card key={label}>
             <div className="flex items-center justify-between">
@@ -70,7 +70,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* 平台分布 */}
         <Card>
           <CardHeader><CardTitle>平台分布</CardTitle></CardHeader>
