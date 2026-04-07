@@ -109,39 +109,41 @@ export default function TaskHistory() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ fontSize: 24, fontWeight: 'bold', margin: 0 }}>任务历史</h1>
-          <p style={{ color: '#7a8ba3', marginTop: 4 }}>注册任务执行记录</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 'bold', margin: 0 }}>任务历史</h1>
+            <p style={{ color: '#7a8ba3', marginTop: 4 }}>注册任务执行记录</p>
+          </div>
+          <Space wrap>
+            <Text type="secondary">{total} 条记录</Text>
+            {selectedRowKeys.length > 0 && <Text type="success">已选 {selectedRowKeys.length} 条</Text>}
+            {selectedRowKeys.length > 0 && (
+              <Popconfirm
+                title={`确认删除选中的 ${selectedRowKeys.length} 条任务历史？`}
+                onConfirm={handleBatchDelete}
+              >
+                <Button danger icon={<DeleteOutlined />}>
+                  删除
+                </Button>
+              </Popconfirm>
+            )}
+            <Select
+              value={platform}
+              onChange={(value) => {
+                setPlatform(value)
+                setSelectedRowKeys([])
+              }}
+              style={{ width: 120 }}
+              options={[
+                { value: '', label: '全部平台' },
+                { value: 'trae', label: 'Trae' },
+                { value: 'cursor', label: 'Cursor' },
+              ]}
+            />
+            <Button icon={<ReloadOutlined spin={loading} />} onClick={load} loading={loading} />
+          </Space>
         </div>
-        <Space>
-          <Text type="secondary">{total} 条记录</Text>
-          {selectedRowKeys.length > 0 && <Text type="success">已选 {selectedRowKeys.length} 条</Text>}
-          {selectedRowKeys.length > 0 && (
-            <Popconfirm
-              title={`确认删除选中的 ${selectedRowKeys.length} 条任务历史？`}
-              onConfirm={handleBatchDelete}
-            >
-              <Button danger icon={<DeleteOutlined />}>
-                删除 {selectedRowKeys.length} 条
-              </Button>
-            </Popconfirm>
-          )}
-          <Select
-            value={platform}
-            onChange={(value) => {
-              setPlatform(value)
-              setSelectedRowKeys([])
-            }}
-            style={{ width: 120 }}
-            options={[
-              { value: '', label: '全部平台' },
-              { value: 'trae', label: 'Trae' },
-              { value: 'cursor', label: 'Cursor' },
-            ]}
-          />
-          <Button icon={<ReloadOutlined spin={loading} />} onClick={load} loading={loading} />
-        </Space>
       </div>
 
       <Card>
@@ -155,6 +157,7 @@ export default function TaskHistory() {
             onChange: (keys) => setSelectedRowKeys(keys as number[]),
           }}
           pagination={{ pageSize: 20, showSizeChanger: false }}
+          scroll={{ x: 800 }}
         />
       </Card>
     </div>

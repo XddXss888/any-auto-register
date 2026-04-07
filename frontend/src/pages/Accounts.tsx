@@ -1249,18 +1249,18 @@ export default function Accounts() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-        <Space>
+      <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <Input.Search
             placeholder="搜索邮箱..."
             allowClear
             onSearch={setSearch}
-            style={{ width: 200 }}
+            style={{ width: 200, flexGrow: 1 }}
           />
           <Select
             placeholder="状态筛选"
             allowClear
-            style={{ width: 120 }}
+            style={{ width: 120, flexGrow: 1 }}
             onChange={setFilterStatus}
             options={[
               { value: 'registered', label: '已注册' },
@@ -1275,19 +1275,23 @@ export default function Accounts() {
             allowClear
             placeholder="开始时间"
             onChange={(value) => setCreatedAtStart(value ? value.toISOString() : '')}
+            style={{ flexGrow: 1 }}
           />
           <DatePicker
             showTime
             allowClear
             placeholder="结束时间"
             onChange={(value) => setCreatedAtEnd(value ? value.toISOString() : '')}
+            style={{ flexGrow: 1 }}
           />
-          <Text type="secondary">{total} 个账号</Text>
-          {selectedRowKeys.length > 0 && (
-            <Text type="success">已选 {selectedRowKeys.length} 个</Text>
-          )}
-        </Space>
-        <Space>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Text type="secondary">{total} 个账号</Text>
+            {selectedRowKeys.length > 0 && (
+              <Text type="success">已选 {selectedRowKeys.length} 个</Text>
+            )}
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {currentPlatform === 'chatgpt' && (
             <Dropdown
               trigger={['click']}
@@ -1336,7 +1340,7 @@ export default function Accounts() {
           <Button icon={<PlusOutlined />} onClick={() => setAddModalOpen(true)}>新增</Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setRegisterModalOpen(true)}>注册</Button>
           <Button icon={<ReloadOutlined spin={loading} />} onClick={load} />
-        </Space>
+        </div>
       </div>
 
       <Table

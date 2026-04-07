@@ -171,6 +171,7 @@ export default function Proxies() {
           dataSource={proxies}
           loading={loading}
           pagination={false}
+          scroll={{ x: 600 }}
         />
       </Card>
     </div>

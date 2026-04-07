@@ -283,22 +283,22 @@ export default function RegisterTaskPage() {
               ]}
             />
           </Form.Item>
-          <Space style={{ width: '100%' }}>
-            <Form.Item name="count" label="批量数量" style={{ flex: 1 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+            <Form.Item name="count" label="批量数量" style={{ flex: '1 1 200px' }}>
               <Input type="number" min={1} />
             </Form.Item>
-            <Form.Item name="concurrency" label="并发数" style={{ flex: 1 }}>
+            <Form.Item name="concurrency" label="并发数" style={{ flex: '1 1 200px' }}>
               <Input type="number" min={1} max={5} />
             </Form.Item>
-          </Space>
-          <Space style={{ width: '100%' }}>
-            <Form.Item name="register_delay_seconds" label="每个注册延迟(秒)" style={{ flex: 1 }}>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+            <Form.Item name="register_delay_seconds" label="每个注册延迟(秒)" style={{ flex: '1 1 200px' }}>
               <InputNumber min={0} precision={1} step={0.5} style={{ width: '100%' }} placeholder="0" />
             </Form.Item>
-            <Form.Item name="proxy" label="代理 (可选)" style={{ flex: 1 }}>
+            <Form.Item name="proxy" label="代理 (可选)" style={{ flex: '1 1 200px' }}>
               <Input placeholder="http://user:pass@host:port" />
             </Form.Item>
-          </Space>
+          </div>
           {platform === 'chatgpt' && (
             <Form.Item label="ChatGPT Token 方案">
               <ChatGPTRegistrationModeSwitch

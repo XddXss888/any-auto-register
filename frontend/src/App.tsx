@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { App as AntdApp, ConfigProvider, Layout, Menu, Button, Spin } from 'antd'
+import { App as AntdApp, ConfigProvider, Layout, Menu, Button, Spin, Drawer } from 'antd'
 import {
   DashboardOutlined,
   UserOutlined,
@@ -10,6 +10,7 @@ import {
   SunOutlined,
   MoonOutlined,
   LogoutOutlined,
+  MenuOutlined,
 } from '@ant-design/icons'
 import zhCN from 'antd/locale/zh_CN'
 import Dashboard from '@/pages/Dashboard'
@@ -22,7 +23,7 @@ import Login from '@/pages/Login'
 import { darkTheme, lightTheme } from './theme'
 import { apiFetch, clearToken, getToken } from '@/lib/utils'
 
-const { Sider, Content } = Layout
+const { Sider, Content, Header } = Layout
 
 function ProtectedLayout() {
   const navigate = useNavigate()
@@ -58,10 +59,18 @@ function AppContent() {
     (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
   )
   const [collapsed, setCollapsed] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [platforms, setPlatforms] = useState<{ key: string; label: string }[]>([])
   const [hasPassword, setHasPassword] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     document.documentElement.classList.toggle('light', themeMode === 'light')
@@ -129,112 +138,152 @@ function AppContent() {
     },
   ]
 
+  const handleMenuClick = ({ key }: { key: string }) => {
+    navigate(key)
+    if (isMobile) setDrawerOpen(false)
+  }
+
+  const sidebarContent = (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div
+        style={{
+          height: 64,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderBottom: `1px solid ${currentTheme.token?.colorBorder}`,
+        }}
+      >
+        <DashboardOutlined style={{ fontSize: 20, color: currentTheme.token?.colorPrimary }} />
+        {(!collapsed || isMobile) && (
+          <span
+            style={{
+              marginLeft: 8,
+              fontWeight: 600,
+              fontSize: 14,
+              color: currentTheme.token?.colorText,
+            }}
+          >
+            Account Manager
+          </span>
+        )}
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto' }}>
+        <Menu
+          mode="inline"
+          selectedKeys={getSelectedKey()}
+          defaultOpenKeys={['/accounts']}
+          items={menuItems}
+          onClick={handleMenuClick}
+          style={{
+            borderRight: 0,
+            background: 'transparent',
+          }}
+        />
+      </div>
+      <div
+        style={{
+          padding: '16px',
+          borderTop: `1px solid ${currentTheme.token?.colorBorder}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        <Button
+          block
+          icon={isLight ? <SunOutlined /> : <MoonOutlined />}
+          onClick={() => setThemeMode(isLight ? 'dark' : 'light')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: (!collapsed || isMobile) ? 'space-between' : 'center',
+          }}
+        >
+          {(!collapsed || isMobile) && (isLight ? '亮色模式' : '暗色模式')}
+        </Button>
+        {hasPassword && (
+          <Button
+            block
+            danger
+            icon={<LogoutOutlined />}
+            onClick={() => { clearToken(); navigate('/login') }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: (!collapsed || isMobile) ? 'space-between' : 'center',
+            }}
+          >
+            {(!collapsed || isMobile) && '退出登录'}
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+
   return (
     <ConfigProvider theme={currentTheme} locale={zhCN}>
       <AntdApp>
       <Layout style={{ minHeight: '100vh' }}>
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={setCollapsed}
-          style={{
-            background: currentTheme.token?.colorBgContainer,
-            borderRight: `1px solid ${currentTheme.token?.colorBorder}`,
-          }}
-          width={220}
-        >
-          <div
+        {!isMobile && (
+          <Sider
+            collapsible
+            collapsed={collapsed}
+            onCollapse={setCollapsed}
             style={{
-              height: 64,
-              display: 'flex',
+              background: currentTheme.token?.colorBgContainer,
+              borderRight: `1px solid ${currentTheme.token?.colorBorder}`,
+            }}
+            width={220}
+          >
+            {sidebarContent}
+          </Sider>
+        )}
+        
+        {isMobile && (
+          <Drawer
+            placement="left"
+            closable={false}
+            onClose={() => setDrawerOpen(false)}
+            open={drawerOpen}
+            width={240}
+            bodyStyle={{ padding: 0, background: currentTheme.token?.colorBgContainer }}
+          >
+            {sidebarContent}
+          </Drawer>
+        )}
+
+        <Layout>
+          {isMobile && (
+            <Header style={{ 
+              background: currentTheme.token?.colorBgContainer, 
+              padding: '0 16px', 
+              display: 'flex', 
               alignItems: 'center',
-              justifyContent: 'center',
-              borderBottom: `1px solid ${currentTheme.token?.colorBorder}`,
+              borderBottom: `1px solid ${currentTheme.token?.colorBorder}`
+            }}>
+              <Button type="text" icon={<MenuOutlined />} onClick={() => setDrawerOpen(true)} style={{ fontSize: '18px', marginRight: 16 }} />
+              <span style={{ fontWeight: 600, fontSize: 16, color: currentTheme.token?.colorText }}>Account Manager</span>
+            </Header>
+          )}
+          <Content
+            style={{
+              padding: isMobile ? 16 : 24,
+              overflow: 'auto',
+              background: currentTheme.token?.colorBgLayout,
             }}
           >
-            <DashboardOutlined style={{ fontSize: 20, color: currentTheme.token?.colorPrimary }} />
-            {!collapsed && (
-              <span
-                style={{
-                  marginLeft: 8,
-                  fontWeight: 600,
-                  fontSize: 14,
-                  color: currentTheme.token?.colorText,
-                }}
-              >
-                Account Manager
-              </span>
-            )}
-          </div>
-          <Menu
-            mode="inline"
-            selectedKeys={getSelectedKey()}
-            defaultOpenKeys={['/accounts']}
-            items={menuItems}
-            onClick={({ key }) => navigate(key)}
-            style={{
-              borderRight: 0,
-              background: 'transparent',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 56,
-              left: 0,
-              right: 0,
-              padding: '0 16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8,
-            }}
-          >
-            <Button
-              block
-              icon={isLight ? <SunOutlined /> : <MoonOutlined />}
-              onClick={() => setThemeMode(isLight ? 'dark' : 'light')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: collapsed ? 'center' : 'space-between',
-              }}
-            >
-              {!collapsed && (isLight ? '亮色模式' : '暗色模式')}
-            </Button>
-            {hasPassword && (
-              <Button
-                block
-                danger
-                icon={<LogoutOutlined />}
-                onClick={() => { clearToken(); navigate('/login') }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: collapsed ? 'center' : 'space-between',
-                }}
-              >
-                {!collapsed && '退出登录'}
-              </Button>
-            )}
-          </div>
-        </Sider>
-        <Content
-          style={{
-            padding: 24,
-            overflow: 'auto',
-            background: currentTheme.token?.colorBgLayout,
-          }}
-        >
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/accounts" element={<Accounts />} />
-            <Route path="/accounts/:platform" element={<Accounts />} />
-            <Route path="/register" element={<RegisterTaskPage />} />
-            <Route path="/history" element={<TaskHistory />} />
-            <Route path="/proxies" element={<Proxies />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </Content>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/accounts/:platform" element={<Accounts />} />
+              <Route path="/register" element={<RegisterTaskPage />} />
+              <Route path="/history" element={<TaskHistory />} />
+              <Route path="/proxies" element={<Proxies />} />
+              <Route path="/settings" element={<Settings />} />
+            </Routes>
+          </Content>
+        </Layout>
       </Layout>
       </AntdApp>
     </ConfigProvider>
