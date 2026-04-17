@@ -42,8 +42,8 @@ func main() {
 			fmt.Println("✅ [验签通过] 成功解析事件类型: checkout.session.completed")
 
 			// 解析 payload 获取 client_reference_id
-			var eventData map[string]interface{}
-			if err := json.Unmarshal(event.Data.Raw, &eventData); err != nil {
+			var session map[string]interface{}
+			if err := json.Unmarshal(event.Data.Raw, &session); err != nil {
 				fmt.Println("❌ 解析事件数据失败:", err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
@@ -52,19 +52,17 @@ func main() {
 			clientRefID := ""
 			amount := float64(0)
 			
-			if obj, ok := eventData["object"].(map[string]interface{}); ok {
-				if ref, ok := obj["client_reference_id"].(string); ok {
-					clientRefID = ref
-				}
-				if amt, ok := obj["amount_total"].(float64); ok {
-					amount = amt
-				}
+			if ref, ok := session["client_reference_id"].(string); ok {
+				clientRefID = ref
+			}
+			if amt, ok := session["amount_total"].(float64); ok {
+				amount = amt
 			}
 
 			// 【第五阶段】: 结果，服务端标记订单已支付，给用户充值
 			fmt.Println("--------------------------------------------------")
 			fmt.Printf("💰 [业务处理] 读取 client_reference_id 查找订单: %s\n", clientRefID)
-			fmt.Printf("💰 [业务处理] 标记订单已支付，给用户充值金额: %.2f\n", amount)
+			fmt.Printf("💰 [业务处理] 标记订单已支付，给用户充值金额: %.2f\n", amount/100)
 			fmt.Println("⚠️  [安全警告] 实际上 Stripe 从未发生真实支付，系统被“零元充值”！")
 			fmt.Println("--------------------------------------------------")
 		}
