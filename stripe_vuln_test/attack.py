@@ -5,7 +5,7 @@ import json
 import requests
 
 # 【第一阶段】：信息收集
-WEBHOOK_URL = "http://localhost:8080/api/stripe/webhook"
+WEBHOOK_URL = "http://localhost:8081/api/stripe/webhook"
 SECRET = b""  # 确认服务端使用了空的 StripeWebhookSecret
 CLIENT_REFERENCE_ID = "USR-9999-HACK-123456" # 目标用户/订单ID
 
