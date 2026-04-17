@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Terminal, Shield, ShieldAlert, Zap, Server, Code, Activity, CheckCircle, XCircle } from 'lucide-react';
 import CryptoJS from 'crypto-js';
+import clsx from 'clsx';
 
 // Types
 type TargetEnv = 'vuln' | 'fixed';
@@ -102,104 +103,105 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-300 font-sans selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-slate-950 text-slate-300 font-sans selection:bg-emerald-500/30 pb-10">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-rose-500/10 rounded-lg">
-              <ShieldAlert className="w-6 h-6 text-rose-500" />
+      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-rose-500/10 rounded-lg shrink-0">
+              <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" />
             </div>
-            <div>
-              <h1 className="font-bold text-slate-100">Stripe Webhook Vulnerability Tester</h1>
-              <p className="text-xs text-slate-500">Signature Forgery Exploit UI</p>
+            <div className="min-w-0">
+              <h1 className="font-bold text-slate-100 text-sm sm:text-base truncate">Stripe Webhook 漏洞测试平台</h1>
+              <p className="text-[10px] sm:text-xs text-slate-500 truncate">签名伪造攻击演示 UI</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-              <Activity className="w-4 h-4 text-emerald-500" />
-              SYSTEM READY
+          <div className="flex items-center shrink-0 ml-2">
+            <span className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-500" />
+              <span className="hidden sm:inline">系统就绪</span>
+              <span className="sm:hidden">就绪</span>
             </span>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 grid lg:grid-cols-12 gap-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 grid lg:grid-cols-12 gap-6 sm:gap-8">
         
         {/* Left Column: Controls & Flow */}
         <div className="lg:col-span-4 space-y-6">
           
           {/* Attack Configuration */}
           <section className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl shadow-black/50">
-            <div className="px-5 py-4 border-b border-slate-800 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-500" />
-              <h2 className="font-semibold text-slate-100">Attack Vector Config</h2>
+            <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-slate-800 flex items-center gap-2">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+              <h2 className="font-semibold text-slate-100 text-sm sm:text-base">攻击向量配置</h2>
             </div>
             
-            <div className="p-5 space-y-5">
+            <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
               {/* Target Env */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Target Environment</label>
-                <div className="grid grid-cols-2 gap-3">
+                <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">目标环境</label>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <button
                     onClick={() => setTarget('vuln')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
+                    className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border transition-all ${
                       target === 'vuln' 
                         ? 'border-rose-500 bg-rose-500/10 text-rose-400' 
                         : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
                     }`}
                   >
-                    <Server className="w-5 h-5 mb-1" />
-                    <span className="text-sm font-medium">Vulnerable (:8080)</span>
+                    <Server className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+                    <span className="text-xs sm:text-sm font-medium mt-1">漏洞版 (:8080)</span>
                   </button>
                   <button
                     onClick={() => setTarget('fixed')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
+                    className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border transition-all ${
                       target === 'fixed' 
                         ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400' 
                         : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
                     }`}
                   >
-                    <Shield className="w-5 h-5 mb-1" />
-                    <span className="text-sm font-medium">Secured (:8081)</span>
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+                    <span className="text-xs sm:text-sm font-medium mt-1">安全版 (:8081)</span>
                   </button>
                 </div>
               </div>
 
               {/* Secret Key */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Signing Secret</label>
+                <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">签名密钥 (Secret)</label>
                 <input
                   type="text"
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
-                  placeholder="Leave empty for zero-secret attack"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600 font-mono"
+                  placeholder="留空以执行空密钥攻击"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600 font-mono"
                 />
-                <p className="text-xs text-slate-500">Stripe HMAC secret used to sign the payload.</p>
+                <p className="text-[10px] sm:text-xs text-slate-500 leading-tight">用于对请求载荷进行签名的 Stripe HMAC 密钥。</p>
               </div>
 
               {/* Client ID */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Target User ID</label>
+                <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">目标用户 ID</label>
                 <input
                   type="text"
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
                 />
               </div>
 
               {/* Amount */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Recharge Amount ($)</label>
+                <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">充值金额</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                  <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 font-mono">$</span>
                   <input
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-8 pr-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg pl-7 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
                   />
                 </div>
               </div>
@@ -208,19 +210,19 @@ function App() {
               <button
                 onClick={executeAttack}
                 disabled={isHacking}
-                className="w-full relative group overflow-hidden rounded-lg mt-4 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full relative group overflow-hidden rounded-lg mt-2 sm:mt-4 disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.98] transition-transform touch-manipulation"
               >
                 <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500 opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative px-6 py-3 flex items-center justify-center gap-2 text-white font-bold tracking-wide text-sm">
+                <div className="relative px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-center gap-2 text-white font-bold tracking-wide text-sm sm:text-base">
                   {isHacking ? (
                     <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      EXECUTING...
+                      <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      执行中...
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
-                      <Code className="w-5 h-5" />
-                      EXECUTE ATTACK
+                      <Code className="w-4 h-4 sm:w-5 sm:h-5" />
+                      执行攻击
                     </span>
                   )}
                 </div>
@@ -229,24 +231,24 @@ function App() {
           </section>
 
           {/* Explainer */}
-          <section className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg p-5">
+          <section className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg p-4 sm:p-5 hidden lg:block">
             <h3 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
               <Activity className="w-4 h-4 text-indigo-400" />
-              Attack Flow
+              攻击流程图解
             </h3>
             <div className="space-y-4">
               {[
-                { step: 1, text: "Configure fake session payload" },
-                { step: 2, text: "Hash payload with empty secret" },
-                { step: 3, text: "Send POST to /api/stripe/webhook" },
-                { step: 4, text: "Server validates signature (Success if secret is empty)" },
-                { step: 5, text: "Zero-dollar recharge executed" },
+                { step: 1, text: "构造虚假订单会话载荷 (Payload)" },
+                { step: 2, text: "使用空密钥对载荷进行哈希计算" },
+                { step: 3, text: "向 /api/stripe/webhook 发送 POST 请求" },
+                { step: 4, text: "服务端验证签名 (若密钥为空则验证通过)" },
+                { step: 5, text: "成功执行“零元充值”业务逻辑" },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-mono text-slate-400 shrink-0">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] sm:text-xs font-mono text-slate-400 shrink-0">
                     {item.step}
                   </div>
-                  <p className="text-sm text-slate-400 leading-tight pt-1">{item.text}</p>
+                  <p className="text-xs sm:text-sm text-slate-400 leading-tight pt-0.5 sm:pt-1">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -254,34 +256,34 @@ function App() {
         </div>
 
         {/* Right Column: Terminal */}
-        <div className="lg:col-span-8 flex flex-col">
-          <section className="flex-1 bg-[#0a0a0a] border border-slate-800 rounded-xl overflow-hidden shadow-2xl shadow-black/50 flex flex-col font-mono text-sm relative">
+        <div className="lg:col-span-8 flex flex-col h-[500px] lg:h-[650px]">
+          <section className="flex-1 bg-[#0a0a0a] border border-slate-800 rounded-xl overflow-hidden shadow-2xl shadow-black/50 flex flex-col font-mono text-xs sm:text-sm relative">
             
             {/* Terminal Header */}
-            <div className="px-4 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+            <div className="px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-slate-500" />
-                <span className="text-slate-400 text-xs tracking-wider">ATTACK_TERMINAL // STDOUT</span>
+                <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />
+                <span className="text-slate-400 text-[10px] sm:text-xs tracking-wider">攻击终端 // STDOUT</span>
               </div>
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-rose-500/20 border border-rose-500/50"></div>
-                <div className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500/50"></div>
-                <div className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50"></div>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-500/20 border border-rose-500/50"></div>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-500/20 border border-amber-500/50"></div>
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50"></div>
               </div>
             </div>
 
             {/* Terminal Output */}
-            <div className="flex-1 p-5 overflow-y-auto space-y-3 max-h-[600px] scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+            <div className="flex-1 p-3 sm:p-5 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent pb-10">
               {logs.length === 0 ? (
                 <div className="text-slate-600 flex items-center gap-2 h-full justify-center">
-                  <Terminal className="w-5 h-5 opacity-50" />
-                  Waiting for execution...
+                  <Terminal className="w-4 h-4 sm:w-5 sm:h-5 opacity-50" />
+                  等待执行...
                 </div>
               ) : (
                 logs.map((log, index) => (
                   <div key={index} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className="flex items-start gap-3">
-                      <span className="text-slate-600 shrink-0 select-none">[{log.time}]</span>
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <span className="text-slate-600 shrink-0 select-none text-[10px] sm:text-xs pt-0.5 sm:pt-0">[{log.time}]</span>
                       <div className="flex-1 overflow-hidden">
                         
                         {/* Log Message */}
@@ -293,14 +295,14 @@ function App() {
                           log.type === 'request' && "text-amber-400",
                           log.type === 'response' && "text-purple-400"
                         )}>
-                          {log.type === 'success' && <CheckCircle className="w-4 h-4 inline mr-2 -mt-1" />}
-                          {log.type === 'error' && <XCircle className="w-4 h-4 inline mr-2 -mt-1" />}
+                          {log.type === 'success' && <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5 -mt-0.5 sm:-mt-1" />}
+                          {log.type === 'error' && <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5 -mt-0.5 sm:-mt-1" />}
                           {log.message}
                         </span>
 
                         {/* Details JSON */}
                         {log.details && (
-                          <div className="mt-2 bg-black/50 p-3 rounded border border-slate-800/50 overflow-x-auto text-xs text-slate-300">
+                          <div className="mt-1.5 sm:mt-2 bg-black/50 p-2 sm:p-3 rounded border border-slate-800/50 overflow-x-auto text-[10px] sm:text-xs text-slate-300">
                             {typeof log.details === 'string' ? (
                               <pre>{log.details}</pre>
                             ) : (
@@ -314,8 +316,8 @@ function App() {
                 ))
               )}
               {isHacking && (
-                <div className="flex items-center gap-2 text-slate-500 animate-pulse">
-                  <span className="w-2 h-4 bg-slate-500 block"></span>
+                <div className="flex items-center gap-2 text-slate-500 animate-pulse mt-2">
+                  <span className="w-1.5 h-3 sm:w-2 sm:h-4 bg-slate-500 block"></span>
                 </div>
               )}
             </div>
