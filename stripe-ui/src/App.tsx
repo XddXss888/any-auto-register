@@ -68,9 +68,22 @@ function App() {
     addLog('info', `生成签名 (Stripe-Signature): ${signature}`);
 
     let endpoint = '';
-    if (target === 'vuln') endpoint = '/api/vuln/api/stripe/webhook';
-    else if (target === 'fixed') endpoint = '/api/fixed/api/stripe/webhook';
-    else endpoint = customUrl;
+    let fetchUrl = '';
+    let extraHeaders: Record<string, string> = {};
+
+    if (target === 'vuln') {
+      endpoint = '/api/vuln/api/stripe/webhook';
+      fetchUrl = endpoint;
+    } else if (target === 'fixed') {
+      endpoint = '/api/fixed/api/stripe/webhook';
+      fetchUrl = endpoint;
+    } else {
+      endpoint = customUrl;
+      // 当选择自定义站点时，前端不再直接请求外部 URL（会被 CORS 拦截），而是发给 Vite 代理服务器
+      fetchUrl = '/api/proxy';
+      // 将真实的外部目标 URL 放在请求头里，让后端的 Vite Proxy 解析并动态转发
+      extraHeaders['X-Target-Url'] = customUrl;
+    }
     
     addLog('request', `POST ${endpoint}`, {
       headers: {
@@ -81,15 +94,16 @@ function App() {
     });
 
     if (target === 'custom') {
-      addLog('warning', '⚠️ 注意：正在向外部域名发送跨域请求 (CORS)。如果目标服务器未配置允许浏览器跨域访问，请求可能会在浏览器端被拦截并显示失败。');
+      addLog('info', 'ℹ️ 提示：为了解决浏览器 CORS 跨域问题，该请求已被路由至本地 Vite 代理服务器进行转发。真实请求将被发送至 -> ' + customUrl);
     }
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(fetchUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Stripe-Signature': signature
+          'Stripe-Signature': signature,
+          ...extraHeaders // 附加给代理服务器解析的特殊 Header
         },
         body: jsonBody
       });
@@ -104,7 +118,7 @@ function App() {
         addLog('error', '❌ 攻击失败，服务端拒绝了伪造请求。');
       }
     } catch (error: any) {
-      addLog('error', `网络请求失败: ${error.message} (如果您测试的是外部站点，这通常是因为目标服务器未允许 CORS 跨域请求)`);
+      addLog('error', `网络请求失败: ${error.message} (可能目标地址不可达或代理服务器异常)`);
     } finally {
       setIsHacking(false);
     }
