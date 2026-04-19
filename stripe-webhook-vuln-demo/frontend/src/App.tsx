@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, ShieldAlert, Zap, Code, Activity, CheckCircle, XCircle, Globe, List } from 'lucide-react';
+import { Terminal, ShieldAlert, Zap, Code, Activity, CheckCircle, XCircle, Globe, List, Upload } from 'lucide-react';
 import CryptoJS from 'crypto-js';
 import clsx from 'clsx';
 
@@ -157,9 +157,60 @@ function App() {
             <div className="p-4 sm:p-5 space-y-4 sm:space-y-5 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700">
               {/* Custom URLs Input */}
               <div className="space-y-2">
-                <label className="text-[10px] sm:text-xs font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
-                  <Globe className="w-3 h-3" /> 目标 Webhook URLs (每行一个)
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] sm:text-xs font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
+                    <Globe className="w-3 h-3" /> 目标 Webhook URLs (每行一个)
+                  </label>
+                  <label className="cursor-pointer flex items-center gap-1 text-[10px] sm:text-[11px] bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 px-2 py-1 rounded border border-indigo-500/30 transition-colors">
+                    <Upload className="w-3 h-3" /> 导入本地文件
+                    <input 
+                      type="file" 
+                      accept=".txt,.csv" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const content = event.target?.result;
+                          if (typeof content === 'string') {
+                            let parsedUrls = content;
+                            
+                            // 针对 CSV 文件进行特殊处理：提取所有包含 http 的单元格
+                            if (file.name.toLowerCase().endsWith('.csv')) {
+                              const lines = content.split(/\r?\n/);
+                              const extractedUrls: string[] = [];
+                              
+                              lines.forEach(line => {
+                                // 简单的 CSV 分割，忽略引号内的逗号问题，仅作快速提取 URL 用
+                                const cells = line.split(',');
+                                cells.forEach(cell => {
+                                  const trimmedCell = cell.trim().replace(/^"|"$/g, ''); // 去除可能存在的引号
+                                  if (trimmedCell.startsWith('http://') || trimmedCell.startsWith('https://')) {
+                                    extractedUrls.push(trimmedCell);
+                                  }
+                                });
+                              });
+                              
+                              if (extractedUrls.length > 0) {
+                                parsedUrls = extractedUrls.join('\n');
+                                addLog('info', `✅ 成功解析 CSV 文件: ${file.name}，提取出 ${extractedUrls.length} 个有效 URL。`);
+                              } else {
+                                addLog('warning', `⚠️ 在 CSV 文件 ${file.name} 中未找到任何以 http/https 开头的 URL，已加载原始内容。`);
+                              }
+                            } else {
+                               addLog('info', `✅ 成功读取本地文本文件: ${file.name}。`);
+                            }
+
+                            setUrlsText(parsedUrls);
+                          }
+                        };
+                        reader.readAsText(file);
+                        e.target.value = ''; // Reset input to allow reading the same file again
+                      }} 
+                    />
+                  </label>
+                </div>
                 <textarea
                   value={urlsText}
                   onChange={(e) => setUrlsText(e.target.value)}
