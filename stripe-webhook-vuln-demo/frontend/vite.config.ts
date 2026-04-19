@@ -31,8 +31,11 @@ export default defineConfig({
                 const targetUrl = new URL(targetUrlStr);
                 
                 // 动态修改代理请求的主机名、端口和路径
+                // @ts-ignore
                 proxyReq.host = targetUrl.hostname;
+                // @ts-ignore
                 if (targetUrl.port) proxyReq.port = targetUrl.port;
+                // @ts-ignore
                 proxyReq.path = targetUrl.pathname + targetUrl.search;
                 
                 // 动态修改请求头中的 Host 为目标服务器的主机名，这是关键步骤，否则目标服务器可能会拒绝
