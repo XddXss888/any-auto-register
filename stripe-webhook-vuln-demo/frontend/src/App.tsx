@@ -18,7 +18,7 @@ interface TestResult {
 }
 
 function App() {
-  const [urlsText, setUrlsText] = useState('http://localhost:8080/api/stripe/webhook\nhttp://localhost:8081/api/stripe/webhook\nhttps://api.example.com/stripe/webhook');
+  const [urlsText, setUrlsText] = useState('');
   const [clientId, setClientId] = useState('USR-9999-HACK-123456');
   const [amount, setAmount] = useState(1); // 默认充值金额修改为 1
   const [secret, setSecret] = useState('');
